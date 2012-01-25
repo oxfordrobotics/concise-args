@@ -373,9 +373,9 @@ std::list<std::string> ConciseArgs::parseVarArg(int numRequired)
       cerr << "ERROR: option '" << opt->longName << "' is mandatory!\n";
       usage(true);
     }
+    if (showHelp)
+      usage(true);
   }
-  if (showHelp)
-    usage(true);
   if (numRequired >= 0 && argv.size() != numRequired) {
     cerr << "ERROR: there are " << argv.size() << " arguments without flags, but " << numRequired
         << "  required arguments\n";
