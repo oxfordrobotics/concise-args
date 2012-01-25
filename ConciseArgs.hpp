@@ -52,7 +52,7 @@ public:
   void add(T & var_ref, const std::string & shortName, const std::string & longName = "",
       const std::string & description = "", bool mandatory = false);
 
-  void addUsageSeperator();
+  void addUsageSeperator(const std::string & sep_msg = "");
 
   // do the parsing of flags, expecting handle 0-3 mandatory arguments (IN ORDER) that don't have options flags
   // calls parseVarArg internally with the apropriate number of remaining arguments
@@ -300,10 +300,10 @@ void ConciseArgs::add(T & var_ref, const std::string & shortName, const std::str
   opts.push_back(new conciseargs_helpers::OptType<T>(shortName, longName, description, var_ref, mandatory));
 }
 
-void ConciseArgs::addUsageSeperator()
+void ConciseArgs::addUsageSeperator(const std::string & sep_msg)
 {
   bool unused;
-  add(unused, "");
+  add(unused, "", "", sep_msg);
 }
 
 std::list<std::string> ConciseArgs::parseVarArg(int numRequired)

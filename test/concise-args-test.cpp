@@ -14,7 +14,9 @@ int main(int argc, char ** argv)
   std::string s = "asdf";
   parser.add(b, "b", "bools", "do bools work?");
   parser.add(i, "i", "ints", "do ints work?", true);
-  parser.addUsageSeperator();
+  parser.addUsageSeperator("\n-------------------------------------------");
+  parser.addUsageSeperator("   Other Options");
+  parser.addUsageSeperator("-------------------------------------------\n");
   parser.add(f, "f", "floats"); //I'm too lazy to provide a description
   parser.add(d, "d"); //I'm too lazy to even put in a longname
   parser.add(s, "s", "strings", "do strings work ?");
