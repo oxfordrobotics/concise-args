@@ -20,6 +20,9 @@ int main(int argc, char ** argv)
   parser.add(s, "s", "strings", "do strings work ?");
   parser.add(c, "c", "chars", "do chars work ?");
 
+  parser.usage(false);
+  std::cerr << "\n\n";
+
   std::string req1;
   int req2;
   parser.parse(req1, req2);
@@ -32,10 +35,6 @@ int main(int argc, char ** argv)
   else {
     std::cerr << "the bool was NOT parsed!\n";
   }
-
-  std::cerr << "\n\n";
-
-  parser.usage(true);
 
 //  //this should force the usage to get printed
 //  if (parser.wasParsed("not there")) {
