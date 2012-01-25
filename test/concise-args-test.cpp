@@ -26,13 +26,6 @@ int main(int argc, char ** argv)
   std::cerr << "req1 is :" << req1 << " req2 is :" << req2 << "\n";
   std::cerr << "i:" << i << " b:" << b << " f:" << f << " d:" << d << " s:" << s << " c:" << c << "\n";
 
-  std::list<std::string> remaining = parser.parseVarArg();
-  std::cerr << "Remaining: ";
-  for (std::list<std::string>::iterator it = remaining.begin(); it != remaining.end(); it++) {
-    std::cerr << *it << " ";
-  }
-  std::cerr << "\n";
-
   if (parser.wasParsed("b")) {
     std::cerr << "the bool was parsed!\n";
   }

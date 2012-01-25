@@ -75,16 +75,17 @@ public:
   bool wasParsed(const std::string & name);
 
   //print the usage
-  void usage(bool ext = false);
+  void usage(bool exitAfterPrinting = false);
 
 private:
   std::string extra_args;
   std::string description;
-  std::string progName;
+  std::string programName;
   std::list<std::string> argv;
   class OptBase;
   std::list<OptBase *> opts;
   bool showHelp;
+  bool parsed;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -154,6 +155,7 @@ OPT_PARSE_MAKE_TYPENAME_TO_STRING(uint64_t);
 OPT_PARSE_MAKE_TYPENAME_TO_STRING(uint32_t);
 OPT_PARSE_MAKE_TYPENAME_TO_STRING(uint16_t);
 OPT_PARSE_MAKE_TYPENAME_TO_STRING(uint8_t);
+OPT_PARSE_MAKE_TYPENAME_TO_STRING(char);
 OPT_PARSE_MAKE_TYPENAME_TO_STRING(bool);
 OPT_PARSE_MAKE_TYPENAME_TO_STRING(std::string);
 
@@ -186,7 +188,7 @@ class OptType: public ConciseArgs::OptBase {
 public:
   OptType(const std::string & _shortName, const std::string & _longName, const std::string & _description, T & _var_ref,
       bool _mandatory) :
-      OptBase(_shortName, _longName, _description, _mandatory), var_ref(_var_ref)
+      OptBase(_shortName, _longName, _description, _mandatory), var_ref(_var_ref), default_val(_var_ref)
   {
   }
   bool parse(const std::string & next, bool & swallowed)
@@ -196,15 +198,15 @@ public:
     T tmp_var;
     std::istringstream ss(next);
     ss >> tmp_var;
-    if (next.size() > 0 && ss.eof()) {
+    if (next.size() > 0 && (ss.peek() == -1)) {
       parsed = true;
       var_ref = tmp_var;
       swallowed = true;
       return true;
     }
     else {
-      std::cerr << "ERROR: Could not parse '" << next << "' as " << typenameToStr<T>() << " value for '" << longName
-          << "'\n";
+      std::cerr << "ERROR: Could not parse '" << next << "' as <" << typenameToStr<T>() << "> value for option '"
+          << longName << "'\n";
       return false;
     }
   }
@@ -223,7 +225,7 @@ public:
     if (mandatory)
       var_str << " = <" + typenameToStr<T>() + ">";
     else
-      var_str << " = [" + to_string(var_ref) + "]";
+      var_str << " = [" + to_string(default_val) + "]";
 
     stringstream msg_str;
     msg_str << left << setw(min_width) << var_str.str() << " ";
@@ -240,6 +242,7 @@ public:
   }
 
   T & var_ref;
+  T default_val;
 }
 ;
 
@@ -255,11 +258,12 @@ bool OptType<bool>::parse(const std::string & next, bool & swallowed)
 
 }
 
-ConciseArgs::ConciseArgs(int _argc, char ** _argv, const std::string & _extra_args, const std::string & _description,
+ConciseArgs::ConciseArgs(int _argc, char ** _argv, const std::string & _extra_args,
+    const std::string & _description,
     bool addHelpOption) :
-    extra_args(_extra_args), description(_description), showHelp(false)
+    extra_args(_extra_args), description(_description), showHelp(false), parsed(false)
 {
-  progName = _argv[0];
+  programName = _argv[0];
   for (int i = 1; i < _argc; i++)
     argv.push_back(std::string(_argv[i]));
   if (addHelpOption)
@@ -305,6 +309,11 @@ void ConciseArgs::addUsageSeperator()
 std::list<std::string> ConciseArgs::parseVarArg(int numRequired)
 {
   using namespace std;
+  if (parsed) {
+    cerr << "ERROR: ConciseArgs parsing was already done once!\n";
+    exit(1);
+  }
+  parsed = true;
   size_t found;
   bool swallowed = false;
   for (list<OptBase *>::iterator oit = opts.begin(); oit != opts.end(); oit++) {
@@ -423,13 +432,13 @@ void ConciseArgs::parse(T1 & var_ref1, T2 & var_ref2, T3 & var_ref3)
     usage(true);
 }
 
-void ConciseArgs::usage(bool ext)
+void ConciseArgs::usage(bool exitAfterPrinting)
 {
   using namespace std;
   size_t found;
-  found = progName.find_last_of("/");
+  found = programName.find_last_of("/");
   if (found != string::npos)
-    progName = progName.substr(found + 1);
+    programName = programName.substr(found + 1);
 
   int maxLongNameLen = 0;
   for (list<OptBase *>::iterator oit = opts.begin(); oit != opts.end(); oit++) {
@@ -448,7 +457,7 @@ void ConciseArgs::usage(bool ext)
   }
 
   cerr << "Usage:\n";
-  cerr << "  " << progName << " [opts] " << extra_args << "\n";
+  cerr << "  " << programName << " [opts] " << extra_args << "\n";
   if (description.size() > 0)
     cerr << " " << description << "\n";
   cerr << "Options:\n";
@@ -460,7 +469,7 @@ void ConciseArgs::usage(bool ext)
       opt->print(maxLongNameLen, maxLongNameStrLen);
   }
   cerr << "\n";
-  if (ext) {
+  if (exitAfterPrinting) {
     exit(1);
   }
 
@@ -469,6 +478,10 @@ void ConciseArgs::usage(bool ext)
 bool ConciseArgs::wasParsed(const std::string & name)
 {
   using namespace std;
+  if (!parsed) {
+    cerr << "ERROR checking parse status of " << name << " : ConciseArgs object hasn't been parsed!\n";
+    exit(1);
+  }
   for (list<OptBase *>::iterator oit = opts.begin(); oit != opts.end(); oit++) {
     OptBase * opt = *oit;
     if (opt->shortName == name || opt->longName == name)
