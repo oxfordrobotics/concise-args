@@ -33,10 +33,14 @@ int main(int argc, char ** argv)
     std::cerr << "the bool was NOT parsed!\n";
   }
 
-  //this should force the usage to get printed
-  if (parser.wasParsed("not there")) {
-    std::cerr << "uhh... oh, something went wrong! THIS SHOULDN'T HAVE BEEN PRINTED \n";
-  }
+  std::cerr << "\n\n";
+
+  parser.usage(true);
+
+//  //this should force the usage to get printed
+//  if (parser.wasParsed("not there")) {
+//    std::cerr << "uhh... oh, something went wrong! THIS SHOULDN'T HAVE BEEN PRINTED \n";
+//  }
 
   return 0;
 }
