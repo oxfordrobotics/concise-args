@@ -33,7 +33,6 @@
 
 #include <list>
 
-
 class ConciseArgs {
 public:
   // setup the argument parser
@@ -198,7 +197,7 @@ public:
     T tmp_var;
     std::istringstream ss(next);
     ss >> tmp_var;
-    if (next.size() > 0 && (ss.peek() == -1)) {
+    if (next.size() > 0 && !ss.fail() && (ss.peek() == std::istringstream::traits_type::eof())) {
       parsed = true;
       var_ref = tmp_var;
       swallowed = true;
