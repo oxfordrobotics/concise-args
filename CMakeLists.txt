@@ -6,7 +6,11 @@ include(cmake/pods.cmake)
 
 
 # make the header public
-pods_install_headers(ConciseArgs.hpp DESTINATION ConciseArgs)
+#pods_install_headers(ConciseArgs.hpp DESTINATION ConciseArgs)
+
+# make and install the <ConciseArgs> header
+configure_file(ConciseArgs.hpp ${INCLUDE_OUTPUT_PATH}/ConciseArgs COPYONLY)
+install(FILES ${INCLUDE_OUTPUT_PATH}/ConciseArgs DESTINATION ${INCLUDE_INSTALL_PATH})
 
 #tell cmake to build these subdirectories
 

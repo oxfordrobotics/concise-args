@@ -1,4 +1,4 @@
-#include <ConciseArgs/ConciseArgs.hpp>
+#include <ConciseArgs>
 int main(int argc, char ** argv)
 {
   bool bl = false;  int in;  float flt = -9; double dbl=3.14;

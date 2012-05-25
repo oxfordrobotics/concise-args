@@ -1,6 +1,5 @@
 #include <stdio.h>
-//#include <ConciseArgs/ConciseArgs.hpp>
-#include "../ConciseArgs.hpp"
+#include <ConciseArgs>
 
 int main(int argc, char ** argv)
 {
