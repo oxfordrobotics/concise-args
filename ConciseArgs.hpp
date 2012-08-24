@@ -242,8 +242,7 @@ public:
 
   T & var_ref;
   T default_val;
-}
-;
+};
 
 //specialization for a boolean flag
 template<>
@@ -253,6 +252,23 @@ bool OptType<bool>::parse(const std::string & next, bool & swallowed)
   swallowed = false;
   var_ref = !var_ref;
   return true;
+}
+
+//specialization for std::string to handle spaces
+template<>
+bool OptType<std::string>::parse(const std::string & next, bool & swallowed)
+{
+//  std::cerr << "next: '" << next << "' " << next.empty() << std::endl;
+  if (!next.empty()) {
+    parsed = true;
+    swallowed = true;
+    var_ref = next;
+    return true;
+  }
+  else {
+    std::cerr << "ERROR: No argument found for <std::string> option '" << longName << "'\n";
+    return false;
+  }
 }
 
 }
