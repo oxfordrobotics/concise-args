@@ -66,9 +66,9 @@ class ConciseArgs {
   void parse(T1 & reqArg1, T2 & reqArg2, T3 & reqArg3);
 
   // do the parsing of flags, and return any unparsed arguments
-  // numRequired specifies the expected number of arguments that don't need a flag
-  // if numRequired >=0, usage will be printed if the number of remaining arguments returned doesn't match
-  std::list<std::string> parseVarArg(int numRequired = -1);
+  // num_required specifies the expected number of arguments that don't need a flag
+  // if num_required >=0, usage will be printed if the number of remaining arguments returned doesn't match
+  std::list<std::string> parseVarArg(size_t num_required = -1);
 
   // Check whether an option was parsed so that you could print something/do something special if it is/isn't
   // Must be a valid option.
@@ -325,7 +325,7 @@ void ConciseArgs::addUsageSeperator(const std::string & sep_msg) {
   add(unused, "", "", sep_msg);
 }
 
-std::list<std::string> ConciseArgs::parseVarArg(int numRequired) {
+std::list<std::string> ConciseArgs::parseVarArg(size_t num_required) {
   using namespace std;
   if (parsed) {
     cerr << "ERROR: ConciseArgs parsing was already done once!\n";
@@ -368,9 +368,9 @@ std::list<std::string> ConciseArgs::parseVarArg(int numRequired) {
       //search for short opt
       found = str.find("-" + opt->shortName);
       if (found == 0) {  //found at start
-        int shortNameLength = opt->shortName.size() + 1;
-        if (str.size() > shortNameLength) {
-          if (!opt->parse(str.substr(shortNameLength), swallowed))
+        size_t short_name_length = opt->shortName.size() + 1;
+        if (str.size() > short_name_length) {
+          if (!opt->parse(str.substr(short_name_length), swallowed))
             usage(true);
         } else {
           list<string>::iterator next_ait = ait;
@@ -398,9 +398,9 @@ std::list<std::string> ConciseArgs::parseVarArg(int numRequired) {
     if (showHelp)
       usage(true);
   }
-  if (numRequired >= 0 && argv.size() != numRequired) {
+  if (num_required >= 0 && argv.size() != num_required) {
     cerr << "ERROR: there are " << argv.size()
-         << " arguments without flags, but " << numRequired
+         << " arguments without flags, but " << num_required
          << "  required arguments\n";
     usage(true);
   }
