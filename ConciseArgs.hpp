@@ -33,6 +33,7 @@
 
 #include <list>
 
+// A class that performs command line argument parsing with a very concise syntax
 class ConciseArgs {
  public:
   // setup the argument parser
@@ -249,7 +250,7 @@ class OptType : public ConciseArgs::OptBase {
 
 //specialization for a boolean flag
 template<>
-bool OptType<bool>::parse(const std::string & next, bool & swallowed) {
+inline bool OptType<bool>::parse(const std::string & next, bool & swallowed) {
   parsed = true;
   swallowed = false;
   var_ref = !var_ref;
@@ -258,7 +259,7 @@ bool OptType<bool>::parse(const std::string & next, bool & swallowed) {
 
 //specialization for std::string to handle spaces
 template<>
-bool OptType<std::string>::parse(const std::string & next, bool & swallowed) {
+inline bool OptType<std::string>::parse(const std::string & next, bool & swallowed) {
 //  std::cerr << "next: '" << next << "' " << next.empty() << std::endl;
   if (!next.empty()) {
     parsed = true;
@@ -274,7 +275,7 @@ bool OptType<std::string>::parse(const std::string & next, bool & swallowed) {
 
 }
 
-ConciseArgs::ConciseArgs(int _argc, char ** _argv,
+inline ConciseArgs::ConciseArgs(int _argc, char ** _argv,
                          const std::string & _extra_args,
                          const std::string & _description, bool addHelpOption)
     : extra_args(_extra_args),
@@ -288,14 +289,14 @@ ConciseArgs::ConciseArgs(int _argc, char ** _argv,
     add(showHelp, "h", "help", "Display this help message");
 }
 
-ConciseArgs::~ConciseArgs() {
+inline ConciseArgs::~ConciseArgs() {
   for (std::list<OptBase *>::iterator oit = opts.begin(); oit != opts.end();
       oit++)
     delete *oit;
 }
 
 template<class T>
-void ConciseArgs::add(T & var_ref, const std::string & shortName,
+inline void ConciseArgs::add(T & var_ref, const std::string & shortName,
                       const std::string & longName,
                       const std::string & description, bool mandatory) {
   using namespace std;
@@ -320,12 +321,12 @@ void ConciseArgs::add(T & var_ref, const std::string & shortName,
                                           var_ref, mandatory));
 }
 
-void ConciseArgs::addUsageSeperator(const std::string & sep_msg) {
+inline void ConciseArgs::addUsageSeperator(const std::string & sep_msg) {
   bool unused;
   add(unused, "", "", sep_msg);
 }
 
-std::list<std::string> ConciseArgs::parseVarArg(size_t num_required) {
+inline std::list<std::string> ConciseArgs::parseVarArg(size_t num_required) {
   using namespace std;
   if (parsed) {
     cerr << "ERROR: ConciseArgs parsing was already done once!\n";
@@ -407,11 +408,12 @@ std::list<std::string> ConciseArgs::parseVarArg(size_t num_required) {
   return argv;
 }
 
-void ConciseArgs::parse() {
+inline void ConciseArgs::parse() {
   parseVarArg(0);
 }
+
 template<class T1>
-void ConciseArgs::parse(T1 & var_ref1) {
+inline void ConciseArgs::parse(T1 & var_ref1) {
   bool swallowed;
   std::list<std::string> req = parseVarArg(1);
   std::list<std::string>::iterator it = req.begin();
@@ -419,8 +421,9 @@ void ConciseArgs::parse(T1 & var_ref1) {
                                         true).parse(*it++, swallowed))
     usage(true);
 }
+
 template<class T1, class T2>
-void ConciseArgs::parse(T1 & var_ref1, T2 & var_ref2) {
+inline void ConciseArgs::parse(T1 & var_ref1, T2 & var_ref2) {
   bool swallowed;
   std::list<std::string> req = parseVarArg(2);
   std::list<std::string>::iterator it = req.begin();
@@ -432,8 +435,9 @@ void ConciseArgs::parse(T1 & var_ref1, T2 & var_ref2) {
     usage(true);
 
 }
+
 template<class T1, class T2, class T3>
-void ConciseArgs::parse(T1 & var_ref1, T2 & var_ref2, T3 & var_ref3) {
+inline void ConciseArgs::parse(T1 & var_ref1, T2 & var_ref2, T3 & var_ref3) {
   bool swallowed;
   std::list<std::string> req = parseVarArg(3);
   std::list<std::string>::iterator it = req.begin();
@@ -448,7 +452,7 @@ void ConciseArgs::parse(T1 & var_ref1, T2 & var_ref2, T3 & var_ref3) {
     usage(true);
 }
 
-void ConciseArgs::usage(bool exitAfterPrinting) {
+inline void ConciseArgs::usage(bool exitAfterPrinting) {
   using namespace std;
   size_t found;
   found = programName.find_last_of("/");
@@ -490,7 +494,7 @@ void ConciseArgs::usage(bool exitAfterPrinting) {
 
 }
 
-bool ConciseArgs::wasParsed(const std::string & name) {
+inline bool ConciseArgs::wasParsed(const std::string & name) {
   using namespace std;
   if (!parsed) {
     cerr << "ERROR checking parse status of " << name
